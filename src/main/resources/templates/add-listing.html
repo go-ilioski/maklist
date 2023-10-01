@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Add Listing</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+</head>
+<body>
+
+<header>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/home">MAKLIST</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+                    aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarsExampleDefault">
+                <ul class="navbar-nav m-auto">
+                    <li class="nav-item m-auto">
+                        <a class="nav-link active" href="/home">Home - Listings</a>
+                    </li>
+                    <th:block th:if="${session.user != null and session.user.getType() == 2 }">
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/reports">Reports for Admin</a>
+                        </li>
+                    </th:block>
+                    <th:block th:if="${session.user != null and session.user.getType() == 1 }">
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/wishlist_by_user">Wishlist</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/maklist/seller">Sell Listing</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/auctions">Bidded Auctions</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/delivery_details">Delivery Details</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/conversations">Conversations</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/my_auctions">My Auctions</a>
+                        </li>
+
+                    </th:block>
+                    <li class="nav-item m-auto">
+                        <a class="nav-link active" href="/views/auctionPages">Auction Pages</a>
+                    </li>
+
+                </ul>
+
+                <form class="form-inline my-2 my-lg-0">
+
+                    <th:block th:if="${session.user != null and session.user.getType() == 1 }">
+                        <a class="btn btn-success btn-sm ml-3" href="/views/shoppingCart">
+                            <i class="fa fa-shopping-cart"></i> Cart
+                        </a>
+                    </th:block>
+
+                    <a class="btn btn-light btn-sm ml-3" href="/logout">
+                        <i class="fa fa-shopping-cart"></i> Logout
+                    </a>
+                    <th:block th:if="${session.user == null }">
+                        <a class="btn btn-light btn-sm ml-3" href="/login">
+                            <i class="fa fa-shopping-cart"></i> Login
+                        </a>
+                    </th:block>
+                    <th:block th:if="${session.user != null }">
+                        <div class="btn btn-primary btn-sm ml-3" th:text="|Welcome ${session.user.getName()} ${session.user.getSurname()}|"></div>
+                    </th:block>
+
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container-fluid">
+    <h2>Add Listing</h2>
+    <div class="row">
+        <div class="col-md-5">
+            <form action="/addListing" method="POST">
+
+                <div class="form-group">
+                    <label for="description">Listing description</label>
+                    <input type="text"
+                           class="form-control"
+                           id="description"
+                           name="description"
+                           th:value="(${product} != null ? ${product.getListingDescription()} : '')"
+                           required
+                           placeholder="Enter listing description">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="number"
+                           class="form-control"
+                           id="price"
+                           name="price"
+                           th:value="(${product} != null ? ${product.getListingPrice()} : '')"
+                           placeholder="Price">
+                </div>
+                <div class="form-group">
+                    <label for="name">Listing name</label>
+                    <input type="text"
+                           class="form-control"
+                           id="name"
+                           name="name"
+                           th:value="(${product} != null ? ${product.getListingName()} : '')"
+                           required
+                           placeholder="Enter listing name">
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number"
+                           class="form-control"
+                           id="quantity"
+                           name="quantity"
+                           th:value="(${product} != null ? ${product.getQuantity()} : '')"
+                           placeholder="Quantity">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" class="form-control">
+                        <option th:if="${product} != null"
+                                th:selected="${product.getCategory() != null && product.getCategory().getId() == cat.getId()}"
+                                th:each="cat : ${categories}"
+                                th:value="${cat.getId()}"
+                                th:text="${cat.getName()}">
+                        </option>
+                        <option th:if="${product} == null"
+                                th:each="cat : ${categories}"
+                                th:value="${cat.getId()}"
+                                th:text="${cat.getName()}">
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <a type="button" class="btn btn-primary" href="/maklist/seller">Back</a>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

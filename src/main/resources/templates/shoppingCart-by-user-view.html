@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>User Shopping Cart</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+<header>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/home">MAKLIST</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+                    aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-end" id="navbarsExampleDefault">
+                <ul class="navbar-nav m-auto">
+                    <li class="nav-item m-auto">
+                        <a class="nav-link active" href="/home">Home - Listings</a>
+                    </li>
+                    <th:block th:if="${session.user != null and session.user.getType() == 2 }">
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/reports">Reports for Admin</a>
+                        </li>
+                    </th:block>
+                    <th:block th:if="${session.user != null and session.user.getType() == 1 }">
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/wishlist_by_user">Wishlist</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/maklist/seller">Sell Listing</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/auctions">Bidded Auctions</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/delivery_details">Delivery Details</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/conversations">Conversations</a>
+                        </li>
+                        <li class="nav-item m-auto">
+                            <a class="nav-link active" href="/views/my_auctions">My Auctions</a>
+                        </li>
+
+                    </th:block>
+                    <li class="nav-item m-auto">
+                        <a class="nav-link active" href="/views/auctionPages">Auction Pages</a>
+                    </li>
+
+                </ul>
+
+                <form class="form-inline my-2 my-lg-0">
+
+                    <th:block th:if="${session.user != null and session.user.getType() == 1 }">
+                        <a class="btn btn-success btn-sm ml-3" href="/views/shoppingCart">
+                            <i class="fa fa-shopping-cart"></i> Cart
+                        </a>
+                    </th:block>
+
+                    <a class="btn btn-light btn-sm ml-3" href="/logout">
+                        <i class="fa fa-shopping-cart"></i> Logout
+                    </a>
+                    <th:block th:if="${session.user == null }">
+                        <a class="btn btn-light btn-sm ml-3" href="/login">
+                            <i class="fa fa-shopping-cart"></i> Login
+                        </a>
+                    </th:block>
+                    <th:block th:if="${session.user != null }">
+                        <div class="btn btn-primary btn-sm ml-3" th:text="|Welcome ${session.user.getName()} ${session.user.getSurname()}|"></div>
+                    </th:block>
+
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container-fluid">
+    <h1>
+        <div th:text="|Shopping Cart by ${session.user.getName()} ${session.user.getSurname()}|"></div>
+    </h1>
+
+    <th:block th:if="${session.user != null and shoppingCarts.content.size() == 0}">
+        <div> Please add items to Cart to purchase them !</div>
+    </th:block>
+
+    <!--  <a th:href="@{/showNewEmployeeForm}" class="btn btn-primary btn-sm mb-3"> Add Employee </a>-->
+
+    <table border="1" class="table table-striped table-responsive-sm">
+        <thead>
+        <tr>
+            <th>shoppingCartItemId</th>
+            <th>listingId</th>
+            <th>listingName</th>
+            <th>listingPrice</th>
+
+            <th> Actions </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="shoppingCarts : ${shoppingCarts.content}">
+            <td th:text="${shoppingCarts.shoppingCartItemId}"></td>
+            <td th:text="${shoppingCarts.listingId}"></td>
+            <td th:text="${shoppingCarts.listingName}"></td>
+            <td th:text="${shoppingCarts.listingPrice}"></td>
+            <td>
+                <a th:href="@{/removeFromCart/{id}(id=${shoppingCarts.listingId})}" class="btn btn-danger">Delete</a>
+                <a th:href="@{/views/getReviews/{id}(id=${shoppingCarts.listingId})}" class="btn btn-warning">Listing Reviews</a>
+            </td>
+        </tr>
+
+        </tbody>
+        <th:block th:if="${shoppingCarts.content.size() > 0 }">
+            <th:block th:if="${session.user != null and session.user.getType() == 1}">
+
+                <a th:href="@{/checkoutCart}" class="btn btn-success">Purchase items in Cart</a>
+
+            </th:block>
+        </th:block>
+
+        <th:block th:if="${shoppingCarts.content.size() == 0}">
+            <a class="btn btn-success">Purchase items in Cart</a>
+        </th:block>
+
+    </table>
+
+    <div th:if="${pageNumber >= 0}">
+        <div class="row col-sm-10">
+            <div class="col-sm-2">
+                Current Page : [[${currentPage}]]
+            </div>
+
+            <div class="col-sm-1">
+                <a th:if="${pageNumber >= 0}" th:href="@{'/views/shoppingCart/page/1'}">First</a>
+                <span th:unless="${pageNumber >= 0}">First</span>
+            </div>
+
+            <div class="col-sm-1">
+                <a th:if="${pageNumber > 0}" th:href="@{'/views/shoppingCart/page/' + ${currentPage - 1}}">Prev</a>
+                <span th:unless="${pageNumber > 0}">Prev</span>
+            </div>
+
+            <div class="col-sm-1">
+                <a th:if="${hasNext}" th:href="@{'/views/shoppingCart/page/' + ${currentPage + 1}}">Next</a>
+                <span th:unless="${hasNext}">Next</span>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+
+</html>
